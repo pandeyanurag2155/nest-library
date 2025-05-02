@@ -7,6 +7,7 @@ import { Book } from 'src/common/entities/book.model';
 import { Order } from 'src/common/entities/order.model';
 import { User } from './entities/user.model';
 import * as bcrypt from 'bcrypt'; 
+import { sendLowStockAlert } from 'src/grpc/notification.client';
 
 @Injectable()
 export class UserService {
@@ -54,8 +55,14 @@ export class UserService {
 
         const book=await this.bookModel.findByPk(bookId,{raw:true});
         console.log("****",book)
+
+        
          if(!book) throw new Error('Book not found')
-            if (book.quantity < quantity) throw new Error('Not enough quantity available');
+
+          if (book.quantity ===0) {
+            sendLowStockAlert(bookId, book.name);
+          }
+          if (book.quantity < quantity) throw new Error('Not enough quantity available');
 
          console.log(book.quantity)
          // Decrease book quantity
@@ -66,6 +73,10 @@ export class UserService {
             id:book.id 
           }
          });
+
+        //  if (book.quantity === 0) {
+        //   sendLowStockAlert(bookId, book.name);
+        // }
 
           const updatedBook = await this.bookModel.findByPk(bookId,{raw:true})
 

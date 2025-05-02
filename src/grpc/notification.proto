@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package notification;
+service NotificationService{
+    rpc SendBookLowStockAlert (BookAlertRequest) returns (BookAlertResponse) ; 
+}
+
+message BookAlertRequest {
+   int32 BookId = 1;
+   string BookTitle = 2;
+}
+
+message BookAlertResponse {
+    string message = 1; 
+}
